@@ -1,43 +1,46 @@
+# Release: builds, packages and publishes GridCraft through the shared Arthavan Projects release
+# workflow (685ks/craft-actions). Run it from Actions > Release > Run workflow with the version to
+# release (normally the [workspace.package] version in Cargo.toml). It creates the GitHub Release
+# tagged v<version> on this repository, as a draft unless `publish` is set; the Arthavan Projects
+# launcher installs and updates GridCraft from these releases. Packaging metadata (ids, icon,
+# categories) is in packaging/app.toml.
 name: Release
 
 on:
-  push:
-    branches: [release]
   workflow_dispatch:
     inputs:
       version:
-        description: "Version override for a test run, e.g. 0.2.0-rc.1 (empty: Cargo.toml)"
+        description: "Version to release, without the leading v (e.g. 0.10.0)"
         type: string
-        default: ""
-
-permissions:
-  contents: write
+        required: true
+      publish:
+        description: "Publish the release (otherwise it stays a draft)"
+        type: boolean
+        default: false
+      prerelease:
+        description: "Mark the release as a pre-release"
+        type: boolean
+        default: false
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ inputs.version }}
   cancel-in-progress: false
 
 jobs:
   release:
-    # Intentionally tracked at @main (not SHA-pinned) so org-wide CI improvements, security fixes, and build optimizations propagate without PR churn across all craftapp repos.
-    uses: storytold/craft-common-actions/.github/workflows/release.yml@main
+    uses: 685ks/craft-actions/.github/workflows/release-rust-app.yml@main
     with:
-      app-name: gridcraft
-      app-title: GridCraft
-      craft-fonts-ref: abb83316d96aa59c1cf64784289e378fe9fa5695
+      app-id: gridcraft
+      display-name: GridCraft
+      bundle-id: app.freedev.ainz.ks.GridCraft
       version: ${{ inputs.version }}
-    secrets:
-      APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-      APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-      KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-      APPLE_ID: ${{ secrets.APPLE_ID }}
-      APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-      WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
-      WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-      AZURE_SIGNING_ENDPOINT: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
-      AZURE_SIGNING_ACCOUNT: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
-      AZURE_CERT_PROFILE: ${{ secrets.AZURE_CERT_PROFILE }}
+      package: gridcraft
+      bin: gridcraft
+      features: ""
+      publish: ${{ inputs.publish }}
+      prerelease: ${{ inputs.prerelease }}
+    secrets: inherit
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write

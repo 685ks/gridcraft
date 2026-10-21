@@ -1,0 +1,13 @@
+# Packaging metadata read by the shared release workflow
+# (685ks/craft-actions/.github/workflows/release-rust-app.yml, called from
+# .github/workflows/release.yml). Asset names: gridcraft-<version>-<os>-<arch>[-portable].<ext>.
+id = "gridcraft"
+display_name = "GridCraft"
+bundle_id = "app.freedev.ainz.ks.GridCraft"
+publisher = "Arthavan Projects"
+description = "A fast, open-source spreadsheet: calculate, analyse and chart data in workbooks, with XLSX files and PDF export"
+categories = ["Office", "Spreadsheet"]
+icon_png = "assets/app-icon/hicolor/512x512/apps/app.freedev.ainz.ks.GridCraft.png"
+icon_icns = "assets/app-icon/gridcraft.icns"
+icon_ico = "assets/app-icon/gridcraft.ico"
+license = "MIT OR Apache-2.0"

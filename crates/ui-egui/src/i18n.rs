@@ -702,11 +702,11 @@ mod tests {
 
     #[test]
     fn unknown_saved_language_keeps_the_other_preferences() {
-        let ui: crate::UiState = serde_json::from_str(r#"{"dark": true, "language": "xx"}"#).unwrap();
-        assert!(ui.dark);
+        let ui: crate::UiState = serde_json::from_str(r#"{"dark": false, "language": "xx"}"#).unwrap();
+        assert!(!ui.dark, "dark is the default, so the saved light choice must survive");
         assert_eq!(ui.language, Language::En);
-        let ui: crate::UiState = serde_json::from_str(r#"{"dark": true, "language": 7}"#).unwrap();
-        assert!(ui.dark);
+        let ui: crate::UiState = serde_json::from_str(r#"{"dark": false, "language": 7}"#).unwrap();
+        assert!(!ui.dark);
         let ui: crate::UiState = serde_json::from_str(r#"{"language": "ja"}"#).unwrap();
         assert_eq!(ui.language, Language::Ja);
         assert_eq!(crate::UiState::default().language, Language::En, "the default never reads the host locale");

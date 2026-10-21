@@ -10,6 +10,7 @@ workspace = true
 
 [dependencies]
 craft-ui = { git = "https://github.com/storytold/craft-libs", rev = "d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d" }
+craft-tokens = { workspace = true }
 gridcraft-engine = { workspace = true }
 gridcraft-chart = { workspace = true }
 egui = { workspace = true }
@@ -39,5 +40,7 @@ sys-locale = { workspace = true }
 web-sys = { version = "0.3", features = ["Window", "Navigator"] }
 
 [build-dependencies]
+# Embeds the fonts of the optional craft-fonts checkout (CRAFT_FONTS_DIR); nothing without it.
+craft-fonts-build = { git = "https://github.com/685ks/craft-fonts", rev = "f28afbb766ccddc9cfd136b8cf0b451a24149e1b" }
 serde_json = { workspace = true }
 toml = "1"

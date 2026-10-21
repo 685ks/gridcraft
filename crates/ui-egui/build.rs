@@ -7,12 +7,18 @@
 //!   JSON says the entry was verified (`people_entry`).
 //!
 //! A missing or malformed file gives empty tables (or no names) and a warning.
+//!
+//! It also embeds the fonts of the optional craft-fonts checkout (`CRAFT_FONTS_DIR`), see
+//! `src/craft_fonts.rs`.
 
 use std::fmt::Write as _;
 
 use serde_json::Value;
 
 fn main() {
+    // The optional craft-fonts build input: OUT_DIR/craft_fonts.rs, empty without CRAFT_FONTS_DIR.
+    // Colour emoji is left out: egui draws outlines only, and its own emoji faces come first.
+    craft_fonts_build::Builder::new().include(|e| !e.family.contains("Emoji")).emit();
     let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../contributors");
     let json = read(&dir.join("contributors.json"), "the About window shows no contributors", |t| {
         serde_json::from_str::<Value>(t).map_err(|e| e.to_string())

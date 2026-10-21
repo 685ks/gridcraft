@@ -8,7 +8,7 @@ version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.90"
-repository = "https://github.com/storytold/gridcraft"
+repository = "https://github.com/685ks/gridcraft"
 
 [workspace.dependencies]
 # internal
@@ -42,6 +42,8 @@ image = { version = "0.25", default-features = false, features = ["png", "jpeg"]
 
 # ui
 egui = "0.36"
+# The house design tokens (colours, radii) shared by the Arthavan Projects apps.
+craft-tokens = { git = "https://github.com/685ks/craft-libs", tag = "v0.1.0", version = "=0.1.0", features = ["egui"] }
 egui_extras = { version = "0.36", default-features = false }
 eframe = { version = "0.36", default-features = false }
 egui_kittest = "0.36"

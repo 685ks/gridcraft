@@ -53,9 +53,9 @@ including tests, 2026-10-10.
 
 ## Platforms and builds
 
-macOS universal, Windows x64/x86/arm64, Linux x86_64/aarch64/riscv64 (AppImage, Flatpak, deb,
-rpm, tarball), FreeBSD, and web (WASM; WebGPU or WebGL2). Release workflows in
-`.github/workflows/release.yml`; see [`releasing.md`](releasing.md).
+Native on macOS, Windows and Linux (FreeBSD builds from source), and web (WASM; WebGPU or
+WebGL2). Releases are built by `.github/workflows/release.yml`, which calls the shared Arthavan
+Projects release workflow with `packaging/app.toml`; see [`releasing.md`](releasing.md).
 
 ## Known architectural gaps
 

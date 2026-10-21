@@ -3,8 +3,10 @@
 //! Usage: `gridcraft [--control <port>] [--sample <name>] [files…]`
 //!
 //! `--control <port>` (or `GRIDCRAFT_CONTROL_PORT`) starts a localhost JSON-lines control
-//! server: `{"id":1,"method":"ui.inspect","params":{}}` → `{"id":1,"ok":true,"result":…}`.
-//! See `gridcraft_ui_egui::control` and `docs/control-protocol.md` for the methods.
+//! server: `{"id":1,"method":"ui.inspect","params":{},"token":"<hex>"}` → `{"id":1,"ok":true,"result":…}`.
+//! The token is made fresh for each launch and written to `<settings dir>/control-<port>.token`
+//! (owner-only); see `gridcraft_engine::control_token`. See `gridcraft_ui_egui::control` and
+//! `docs/control-protocol.md` for the methods.
 #![cfg_attr(all(target_os = "windows", not(debug_assertions)), windows_subsystem = "windows")]
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
@@ -24,6 +26,22 @@ use std::rc::Rc;
 use gridcraft_engine::Session;
 use gridcraft_ui_egui::{Services, SheetApp};
 use serde_json::json;
+
+/// This launch's control token file, removed on exit.
+static TOKEN_FILE: std::sync::OnceLock<std::path::PathBuf> = std::sync::OnceLock::new();
+
+/// A fresh 256-bit control token, written owner-only to the settings directory for `port`.
+/// Returns the token and its file, or why the control server can't start safely.
+fn control_token(port: u16) -> Result<(String, std::path::PathBuf), String> {
+    use gridcraft_engine::control_token as ct;
+    let mut bytes = [0u8; 32];
+    getrandom::fill(&mut bytes).map_err(|e| format!("no secure random numbers for the control token: {e}"))?;
+    let token = ct::to_hex(&bytes);
+    let dir = config_dir().ok_or("no settings directory for the control token (HOME, XDG_CONFIG_HOME or APPDATA is not set)")?;
+    let path = ct::token_path(&dir, port);
+    ct::write_token(&path, &token).map_err(|e| format!("writing {}: {e}", path.display()))?;
+    Ok((token, path))
+}
 
 struct App(SheetApp, #[cfg(target_os = "macos")] Option<native_menu::NativeMenu>, #[cfg(target_os = "macos")] fmv_macos_events::Inbox);
 
@@ -60,6 +78,10 @@ impl eframe::App for App {
     fn on_exit(&mut self) {
         print::finish_pending_jobs();
         save_prefs(&self.0);
+        // The control token dies with this launch.
+        if let Some(path) = TOKEN_FILE.get() {
+            let _ = std::fs::remove_file(path);
+        }
         // macOS (#117): end the process here, before eframe tears the window down. AccessKit's
         // macOS adapter subclasses the window's content view and restores its class on teardown;
         // AppKit's Touch Bar support observes that view (KVO), so in the next display cycle
@@ -224,7 +246,7 @@ fn icon() -> Option<egui::IconData> {
     #[cfg(target_os = "macos")]
     let bytes = include_bytes!("../../../assets/app-icon/gridcraft-macos-512.png");
     #[cfg(not(target_os = "macos"))]
-    let bytes = include_bytes!("../../../assets/app-icon/hicolor/256x256/apps/ai.storyteller.gridcraft.png");
+    let bytes = include_bytes!("../../../assets/app-icon/hicolor/256x256/apps/app.freedev.ainz.ks.GridCraft.png");
     let img = image::load_from_memory(bytes).ok()?.to_rgba8();
     Some(egui::IconData { width: img.width(), height: img.height(), rgba: img.into_raw() })
 }
@@ -312,7 +334,7 @@ fn main() -> eframe::Result<()> {
         .with_title("GridCraft")
         .with_inner_size([1440.0, 900.0])
         .with_min_inner_size([640.0, 420.0])
-        .with_app_id("ai.storyteller.gridcraft")
+        .with_app_id("app.freedev.ainz.ks.GridCraft")
         .with_drag_and_drop(true);
     if cfg!(target_os = "macos") {
         viewport = viewport.with_fullsize_content_view(true).with_titlebar_shown(false).with_title_shown(false);
@@ -352,9 +374,16 @@ fn main() -> eframe::Result<()> {
                 };
                 SheetApp::setup_context_for_language(&cc.egui_ctx, app.ui.dark, app.ui.language);
                 if let Some(port) = control_port {
-                    match control_server::start(port, cc.egui_ctx.clone()) {
-                        Ok(rx) => app.control_rx = Some(rx),
-                        Err(e) => log::error!("control channel on port {port}: {e}"),
+                    match control_token(port) {
+                        Ok((token, path)) => {
+                            log::info!("control token in {}", path.display());
+                            match control_server::start(port, std::sync::Arc::from(token), cc.egui_ctx.clone()) {
+                                Ok(rx) => app.control_rx = Some(rx),
+                                Err(e) => log::error!("control channel on port {port}: {e}"),
+                            }
+                            let _ = TOKEN_FILE.set(path);
+                        }
+                        Err(e) => log::error!("control channel not started: {e}"),
                     }
                 }
                 Ok(Box::new(App(

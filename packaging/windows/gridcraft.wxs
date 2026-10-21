@@ -9,19 +9,19 @@
   and GridCraft offered under "Open with" (and in Settings > Default apps) for .xlsx, .xlsm,
   .csv and .tsv, without taking over the user's default app for them.
 
-  UpgradeCode is fixed for GridCraft (generated 2026-10-07): never change it, or upgrades
+  UpgradeCode is fixed for this fork of GridCraft (generated 2026-10-21, distinct from upstream's): never change it, or upgrades
   install side by side instead of replacing the old version.
 -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package
       Name="GridCraft"
-      Manufacturer="Learning Machines LLC"
+      Manufacturer="Arthavan Projects"
       Version="$(var.Version)"
-      UpgradeCode="5511327B-F305-41BE-92D0-EB84944E7C4D"
+      UpgradeCode="C72B2109-6F95-49E9-81D2-88C8B413618C"
       Scope="perMachine"
       Compressed="yes"
       Language="1033">
-    <SummaryInformation Description="GridCraft spreadsheet" Manufacturer="Learning Machines LLC" />
+    <SummaryInformation Description="GridCraft spreadsheet" Manufacturer="Arthavan Projects" />
     <!-- Same-version upgrades let successive pre-releases of one X.Y.Z replace each other
          (MSI versions are numeric, so 1.2.3-rc.1 and 1.2.3-rc.2 are both 1.2.3). -->
     <MajorUpgrade AllowSameVersionUpgrades="yes"
@@ -30,9 +30,9 @@
 
     <Icon Id="GridcraftIcon.ico" SourceFile="$(var.IconPath)" />
     <Property Id="ARPPRODUCTICON" Value="GridcraftIcon.ico" />
-    <Property Id="ARPURLINFOABOUT" Value="https://getartcraft.com/apps/gridcraft" />
-    <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/gridcraft" />
-    <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/685ks/gridcraft" />
+    <Property Id="ARPURLUPDATEINFO" Value="https://github.com/685ks/gridcraft/releases" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/685ks/gridcraft/issues" />
 
     <!-- An explicit command-line value wins. Otherwise retain the previous installation's
          choice, defaulting to off for a fresh install. Run only in the first sequence so the

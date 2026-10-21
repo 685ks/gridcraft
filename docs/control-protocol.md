@@ -15,6 +15,20 @@ Then send newline-delimited JSON to `127.0.0.1:7979`. Every request line gets on
 
 Errors come back as `{"id": …, "ok": false, "error": "…"}`.
 
+**Authentication.** Each launch makes a random 256-bit token and writes it as 64 hex digits to
+`control-<port>.token` in the settings directory (Linux `~/.config/gridcraft/`, macOS
+`~/Library/Application Support/GridCraft/`, Windows `%APPDATA%\GridCraft\`), readable by the
+owner only (mode 0600 on Unix), and removes it on exit. The first request on a connection must
+carry it as a top-level `token` field (`{"id":1,"method":"ui.inspect","token":"<hex>"}`); the
+`auth` method checks it without running anything. Later requests on that connection may omit it;
+a wrong one closes the connection. A missing or wrong token gets one
+`{"ok":false,"error":"unauthorized: …"}` reply and the connection closes; nothing reaches the app.
+`gridcraft-cli send` and `gridcraft-cli mcp --connect` read the file for the port they connect to,
+or `GRIDCRAFT_CONTROL_TOKEN` when it is set. Peers that are not loopback addresses are refused. If
+no token can be made or stored, the control channel does not start. Tests:
+`apps/gridcraft/src/control_server.rs`, `crates/mcp/src/tests.rs`
+(`requests_carry_the_control_token`), `crates/engine/src/control_token.rs`.
+
 A line that is not a JSON object with a string `method` (an HTTP request, text that isn't JSON,
 bytes that aren't UTF-8, a line over 64 MiB) gets one error reply and the server closes the
 connection; nothing sent after it runs. Blank lines are skipped.

@@ -10,6 +10,7 @@ pub mod catalog;
 pub mod cf;
 mod clip_html;
 pub mod cmd;
+pub mod control_token;
 pub mod display;
 pub mod fill;
 pub mod io;
