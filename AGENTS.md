@@ -17,7 +17,7 @@ Standards and learnings shared across the crafting apps live in `../../craftrule
 - Prefer art generated in code: the UI icon set (`crates/ui-egui/src/icons.rs`), table and cell style palettes, themes and sample workbooks are drawn/defined in code and original.
 - Never copy Office's icons, ribbon artwork, theme XML, table-style definitions, templates, clip art or wording beyond feature names. Excel feature *names* (menu labels, function names) are fine.
 - Screenshots of Microsoft software are never committed (they live only in `plan/excel/screenshots/`).
-- The ArtCraft brand files in `docs/brand/` are ArtCraft trademarks under `docs/brand/LICENSE-brand.txt`, the one exception.
+- **No ArtCraft marks.** This repository is Arthavan Projects' fork of [storytold/gridcraft](https://github.com/storytold/gridcraft), not affiliated with or endorsed by ArtCraft: keep the ArtCraft name, wordmark and logos (and links to its website and Discord) out of it. `LICENSE-*` and `NOTICE` keep the upstream copyright line.
 
 ## Never crash
 People trust GridCraft with their numbers; a crash loses their work. **This outranks feature work.** Standard: [`craftrules/standards/never-crash.md`](https://github.com/storytold/craftrules/blob/main/standards/never-crash.md).
@@ -31,7 +31,7 @@ People trust GridCraft with their numbers; a crash loses their work. **This outr
 
 ## Non-negotiables
 - **Clean-room.** Microsoft Excel is installed on the dev machine and may be *observed* black-box: run it, use its UI with synthetic workbooks, take screenshots (by window id) stored only under `plan/excel/screenshots/`. Never read, disassemble or copy anything inside the Office bundle, never commit files produced by Excel, never copy GPL/AGPL/LGPL code (LibreOffice, Gnumeric…). Function behaviour comes from public documentation and observation.
-- **Fonts live in [`storytold/craft-fonts`](https://github.com/storytold/craft-fonts)**, never in this repo. It is an optional build input (`CRAFT_FONTS_DIR`); without it the app uses system fonts and egui's defaults. Standard: craftrules `standards/fonts.md`.
+- **Fonts live in [`685ks/craft-fonts`](https://github.com/685ks/craft-fonts)**, never in this repo. It is an optional build input (`CRAFT_FONTS_DIR=/abs/path/to/craft-fonts`): `crates/ui-egui/build.rs` embeds its fonts through `craft-fonts-build` as fallbacks after the system faces (`crates/ui-egui/src/craft_fonts.rs`). Without it the app uses system fonts and egui's defaults, and everything must still build and test. Standard: craftrules `standards/fonts.md`.
 - **Test corpora** (real Excel-authored files) live in a separate corpus repo, fetched pinned and sha256-verified (craftrules `standards/test-corpora.md`). Never commit large binary fixtures; build test workbooks in code.
 - **Everything is a command.** User-visible behaviour = a command in `crates/engine/src/cmd/*` (id, label, ribbon path, shortcut, params doc, `enabled`, `run`) + tests. Ids follow Excel's ribbon (`home.bold`, `insert.chart`, `data.sortAscending`) plus primitives (`cell.set`, `selection.set`, `range.setValues`). UI-only commands live in `crates/ui-egui`. The control channel, CLI and MCP reach all of them.
 - **Programmatic calls never open dialogs**: a command with empty params runs with defaults or returns an error; only menu-style invocation opens a dialog (`UiRequest::Dialog`).
@@ -42,7 +42,7 @@ People trust GridCraft with their numbers; a crash loses their work. **This outr
 
 ## Running and looking at the app
 - `cargo run --release -p gridcraft -- --sample sales --control 7979` (sample workbook + control channel).
-- Drive it: JSON lines on `127.0.0.1:7979`, e.g. `{"id":1,"method":"engine.execute","params":{"command":"cell.set","params":{"cell":"B2","input":"=SUM(A1:A9)"}}}` then `{"id":2,"method":"ui.screenshot","params":{"path":"/tmp/shot.png"}}`. Methods: `crates/ui-egui/src/control.rs`, docs: `docs/control-protocol.md`.
+- Drive it: JSON lines on `127.0.0.1:7979`, each request carrying `"token"` from `<settings dir>/control-7979.token` (per launch; `docs/control-protocol.md`), e.g. `{"id":1,"method":"engine.execute","params":{"command":"cell.set","params":{"cell":"B2","input":"=SUM(A1:A9)"}}}` then `{"id":2,"method":"ui.screenshot","params":{"path":"/tmp/shot.png"}}`. Methods: `crates/ui-egui/src/control.rs`, docs: `docs/control-protocol.md`.
 - **Offscreen UI render** (no window, from a source checkout): `cargo run -p gridcraft-ui-egui --example snapshot -- --sample sales out.png`.
 - Headless: `gridcraft-cli eval '=SUM(1,2,3)'`, `gridcraft-cli run --in book.xlsx --cmd 'home.bold={"range":"A1:C1"}' --out book.xlsx`, `gridcraft-cli mcp`.
 - **For UI work, look at the result** (snapshot PNG) and compare with `plan/excel/observed-ui.md`.

@@ -1,10 +1,10 @@
-# Quick release-pipeline checks without a Rust build: workflow and packaging-script syntax,
-# Linux desktop metadata, and the Windows desktop-shortcut installer lifecycle.
+# Quick static checks for the release pipeline (seconds, no Rust build): the Linux desktop entry,
+# the AppStream, MIME, WiX and Info.plist XML, and the packaging metadata the release workflow reads.
 name: Packaging lint
 
 on:
   push:
-    branches: [main, release]
+    branches: [main]
     paths: [".github/workflows/**", "packaging/**", "assets/app-icon/**"]
   pull_request:
     paths: [".github/workflows/**", "packaging/**", "assets/app-icon/**"]
@@ -19,5 +19,35 @@ concurrency:
 
 jobs:
   lint:
-    # Intentionally tracked at @main (not SHA-pinned) so org-wide CI improvements, security fixes, and build optimizations propagate without PR churn across all craftapp repos.
-    uses: storytold/craft-common-actions/.github/workflows/packaging-lint.yml@main
+    timeout-minutes: 10
+    name: Desktop metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install validators
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends desktop-file-utils libxml2-utils
+      - name: Validate the desktop entry and XML metadata
+        run: |
+          set -euo pipefail
+          desktop-file-validate packaging/linux/app.freedev.ainz.ks.GridCraft.desktop
+          xmllint --noout packaging/linux/app.freedev.ainz.ks.GridCraft.metainfo.xml.in \
+            packaging/linux/app.freedev.ainz.ks.GridCraft.mime.xml packaging/windows/gridcraft.wxs \
+            packaging/macos/Info.plist.in
+      - name: Check packaging/app.toml
+        shell: python3 {0}
+        run: |
+          import os, struct, tomllib
+          d = tomllib.load(open("packaging/app.toml", "rb"))
+          assert d["id"] == "gridcraft", d
+          assert d["bundle_id"] == "app.freedev.ainz.ks.GridCraft", d
+          assert d["publisher"] == "Arthavan Projects", d
+          assert d["license"] == "MIT OR Apache-2.0", d
+          for key in ("icon_png", "icon_icns", "icon_ico"):
+              assert os.path.isfile(d[key]), (key, d[key])
+          with open(d["icon_png"], "rb") as f:
+              head = f.read(24)
+          assert head[:8] == b"\x89PNG\r\n\x1a\n", "icon_png is not a PNG"
+          w, h = struct.unpack(">II", head[16:24])
+          assert w == h and w >= 256, f"icon_png must be square and at least 256 px, is {w}x{h}"

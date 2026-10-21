@@ -23,6 +23,11 @@ fn harness(ui: UiState) -> egui_kittest::Harness<'static, SheetApp> {
     h
 }
 
+/// Saved preferences that chose the light theme (the house dark theme is the default).
+fn light() -> UiState {
+    UiState { dark: false, ..UiState::default() }
+}
+
 fn preferences(h: &egui_kittest::Harness<'static, SheetApp>) -> Value {
     serde_json::to_value(&h.state().ui).unwrap()
 }
@@ -105,7 +110,7 @@ fn system_tracks_live_os_changes_with_both_gridcraft_palettes_and_light_fallback
 
 #[test]
 fn ribbon_selects_system_and_fixed_modes_ignore_subsequent_os_changes() {
-    let mut h = harness(UiState::default());
+    let mut h = harness(light());
     system_theme(&mut h, Some(Theme::Dark));
     assert_appearance(&h, false);
     h.state_mut().run("ui.ribbonTab", json!({"tab": "View"})).unwrap();
@@ -166,7 +171,7 @@ fn invalid_mode_preserves_preferences_and_legacy_overrides_leave_system_mode() {
 #[test]
 fn title_bar_switch_and_file_menu_choose_the_theme() {
     // #194: one click in the title bar switches light/dark; File › Display theme offers all three.
-    let mut h = harness(UiState::default());
+    let mut h = harness(light());
     system_theme(&mut h, Some(Theme::Light));
     assert_appearance(&h, false);
     h.get_by_role_and_label(egui::accesskit::Role::CheckBox, "Dark Mode").click();
@@ -191,4 +196,14 @@ fn title_bar_switch_and_file_menu_choose_the_theme() {
     assert_eq!(preferences(&h)["systemTheme"], true);
     system_theme(&mut h, Some(Theme::Dark));
     assert_appearance(&h, true);
+}
+
+#[test]
+fn the_house_theme_is_the_default_whatever_the_os_reports() {
+    for os in [Some(Theme::Light), Some(Theme::Dark), None] {
+        let mut h = harness(UiState::default());
+        system_theme(&mut h, os);
+        assert_appearance(&h, true);
+        assert_eq!(preferences(&h)["systemTheme"], false);
+    }
 }

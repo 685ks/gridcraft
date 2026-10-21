@@ -12,7 +12,7 @@
 set -euo pipefail
 # shellcheck source=../env.sh
 . "$(dirname "${BASH_SOURCE[0]}")/../env.sh"
-APP_ID=ai.storyteller.gridcraft
+APP_ID=app.freedev.ainz.ks.GridCraft
 LINUX="$ROOT/packaging/linux"
 
 SKIP_BUILD=0

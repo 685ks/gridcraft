@@ -546,3 +546,26 @@ fn invalid_sort_keys_are_invalid_params() {
     }
     ok(&mut s, "sort_range", json!({"range": "A1:A3", "keys": ["A", {"column": "A", "order": "desc"}]}));
 }
+
+/// Every request carries the app's control token, so the app serves it (and a reconnect).
+#[test]
+fn requests_carry_the_control_token() {
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = listener.local_addr().unwrap().to_string();
+    let peer = std::thread::spawn(move || {
+        let (stream, _) = listener.accept().unwrap();
+        stream.set_read_timeout(Some(std::time::Duration::from_secs(5))).unwrap();
+        let mut w = stream.try_clone().unwrap();
+        let mut line = String::new();
+        BufReader::new(stream).read_line(&mut line).unwrap();
+        let v: Value = serde_json::from_str(&line).unwrap();
+        writeln!(w, "{}", json!({"id": v["id"], "ok": true, "result": null})).unwrap();
+        v
+    });
+    let token = "ab".repeat(32);
+    let mut remote = Remote::connect_with_token(&addr, Some(token.clone())).unwrap();
+    assert_eq!(remote.call("ui.inspect", json!({})), Ok(Value::Null));
+    let sent = peer.join().unwrap();
+    assert_eq!(sent["token"], token.as_str());
+    assert_eq!(sent["method"], "ui.inspect");
+}

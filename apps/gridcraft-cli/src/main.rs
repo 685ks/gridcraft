@@ -47,6 +47,8 @@ const USAGE: &str = "usage:
   gridcraft-cli functions [--json] [--search X] [--category C]
   gridcraft-cli mcp [--connect PORT] [--in FILE | --sample NAME]
   gridcraft-cli send <port> <method> [json]
+                     send and mcp --connect send the app's control token, read from its
+                     settings folder (control-PORT.token) or GRIDCRAFT_CONTROL_TOKEN
   gridcraft-cli version";
 
 /// stdout went away. A reader that stopped early (a closed pipe) ends the program quietly; any

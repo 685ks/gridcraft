@@ -1,6 +1,9 @@
 //! Design tokens and fonts.
 //!
-//! Colours are our own, tuned to read like a modern desktop spreadsheet. Fonts come from the
+//! Dark mode (the default) is the house theme, the Arthavan Projects design system filled from the
+//! shared `craft-tokens` crate ([`Tokens::house`]): steel-blue accent on near-black chrome, with the
+//! cells kept as light as a printed page. Light mode stays as the alternate; its colours are our
+//! own, tuned to read like a modern desktop spreadsheet. Fonts come from the
 //! operating system at runtime (nothing bundled): the UI uses the platform UI font, cells use the
 //! best available match for the workbook font (Calibri/Carlito/Aptos/Arial…) with egui's built-in
 //! fonts as the last resort.
@@ -95,45 +98,59 @@ impl Tokens {
         }
     }
 
+    /// Dark mode: the house theme.
     pub fn dark() -> Tokens {
+        Tokens::house()
+    }
+
+    /// The house theme: the shared design tokens (`craft-tokens`) on the chrome (window, ribbon,
+    /// headers, panels, tabs, status bar). Translucent web surfaces are flattened onto the opaque
+    /// panel, since egui can't blur what is behind it. The cells keep their document colours
+    /// (white, black text, light gridlines), so the selection uses the accent's dark shade.
+    pub fn house() -> Tokens {
+        use craft_tokens::{Rgba, color as c};
+        let card = c::SURFACE_PANEL.over(c::BG_BASE);
+        let on_card = |x: Rgba| Color32::from(x.over(card));
+        let white = |alpha: f32| on_card(Rgba::rgb(255, 255, 255).with_alpha(alpha));
+        let accent_wash = on_card(c::ACCENT_BASE.with_alpha(0.22));
         Tokens {
             dark: true,
-            window: Color32::from_rgb(0x29, 0x29, 0x29),
-            ribbon: Color32::from_rgb(0x33, 0x33, 0x33),
-            ribbon_border: Color32::from_rgb(0x40, 0x40, 0x40),
-            text: Color32::from_rgb(0xEE, 0xEE, 0xEE),
-            text_dim: Color32::from_rgb(0xB0, 0xB0, 0xB0),
-            text_disabled: Color32::from_rgb(0x70, 0x70, 0x70),
-            accent: Color32::from_rgb(0x5C, 0xC5, 0x87),
-            accent_dark: Color32::from_rgb(0x3F, 0xA8, 0x6C),
-            accent_soft: Color32::from_rgb(0x23, 0x45, 0x31),
-            hover: Color32::from_rgb(0x42, 0x42, 0x42),
-            pressed: Color32::from_rgb(0x4D, 0x4D, 0x4D),
-            separator: Color32::from_rgb(0x48, 0x48, 0x48),
+            window: c::BG_BASE.into(),
+            ribbon: card.into(),
+            ribbon_border: on_card(c::BORDER_LINE),
+            text: c::TEXT_INK.into(),
+            text_dim: c::TEXT_MUTED.into(),
+            text_disabled: white(0.28),
+            accent: c::ACCENT_BASE.into(),
+            accent_dark: c::ACCENT_LOW.into(),
+            accent_soft: accent_wash,
+            hover: on_card(c::SURFACE_FILL_FOCUS),
+            pressed: white(0.09),
+            separator: on_card(c::BORDER_LINE),
             grid_bg: Color32::WHITE,
-            desk: Color32::from_rgb(0x3A, 0x3A, 0x3A),
+            desk: c::BG_BASE.into(),
             gridline: Color32::from_rgb(0xE1, 0xE1, 0xE1),
-            header_bg: Color32::from_rgb(0x30, 0x30, 0x30),
-            header_text: Color32::from_rgb(0xCC, 0xCC, 0xCC),
-            header_line: Color32::from_rgb(0x45, 0x45, 0x45),
-            header_sel_bg: Color32::from_rgb(0x45, 0x45, 0x45),
-            header_sel_text: Color32::from_rgb(0x5C, 0xC5, 0x87),
-            header_all_bg: Color32::from_rgb(0x2E, 0x55, 0x3E),
-            sel_fill: Color32::from_rgba_unmultiplied(0x10, 0x7C, 0x41, 0x24),
-            sel_border: Color32::from_rgb(0x10, 0x7C, 0x41),
-            input_bg: Color32::from_rgb(0x1F, 0x1F, 0x1F),
-            input_border: Color32::from_rgb(0x50, 0x50, 0x50),
-            tab_bar: Color32::from_rgb(0x29, 0x29, 0x29),
-            tab_active: Color32::from_rgb(0x3A, 0x3A, 0x3A),
-            status_bar: Color32::from_rgb(0x29, 0x29, 0x29),
+            header_bg: card.into(),
+            header_text: c::TEXT_STRONG.into(),
+            header_line: on_card(c::BORDER_LINE),
+            header_sel_bg: white(0.09),
+            header_sel_text: c::ACCENT_BRIGHT.into(),
+            header_all_bg: accent_wash,
+            sel_fill: c::ACCENT_LOW.with_alpha(0.12).into(),
+            sel_border: c::ACCENT_LOW.into(),
+            input_bg: c::BG_BASE.into(),
+            input_border: c::TEXT_FAINT.into(),
+            tab_bar: c::BG_SHEET.into(),
+            tab_active: card.into(),
+            status_bar: c::BG_SHEET.into(),
             cell_text: Color32::BLACK,
-            menu_bg: Color32::from_rgb(0x30, 0x30, 0x30),
+            menu_bg: card.into(),
             shadow: Color32::from_black_alpha(90),
-            danger: Color32::from_rgb(0xF1, 0x70, 0x5F),
-            notice_warn_bg: Color32::from_rgb(0x4A, 0x3F, 0x1E),
-            notice_warn_border: Color32::from_rgb(0x7A, 0x67, 0x30),
-            notice_info_bg: Color32::from_rgb(0x24, 0x33, 0x44),
-            notice_info_border: Color32::from_rgb(0x3B, 0x55, 0x72),
+            danger: c::STATUS_ERROR.into(),
+            notice_warn_bg: on_card(c::STATUS_WARN.with_alpha(0.16)),
+            notice_warn_border: on_card(c::STATUS_WARN.with_alpha(0.45)),
+            notice_info_bg: on_card(c::ACCENT_BASE.with_alpha(0.14)),
+            notice_info_border: on_card(c::ACCENT_BASE.with_alpha(0.40)),
         }
     }
 
@@ -393,7 +410,11 @@ pub fn font_definitions_with(language: crate::i18n::Language, used: &[String]) -
     let mut bound: Vec<String> = Vec::new();
     // The non-Latin fallback faces have to sit at the end of each chain: a Latin font owns Latin,
     // and epaint picks the first face that has the glyph, so they only catch their own scripts.
-    let fallback = load_fallback(&mut fonts, HanOrder::of(language));
+    let mut fallback = load_fallback(&mut fonts, HanOrder::of(language));
+    // The embedded craft-fonts faces (if built with them) come after the system fallback faces.
+    let (craft_ui, craft_mono) = crate::craft_fonts::load(&mut fonts);
+    let system_fallback = fallback.clone();
+    fallback.extend(craft_ui.iter().filter(|k| !system_fallback.contains(k)).cloned());
     for role in [UI, UI_BOLD, CELL, CELL_BOLD, CELL_ITALIC, CELL_BOLD_ITALIC, SERIF, MONO] {
         let paths = candidates(role);
         let refs: Vec<(&str, u32)> = paths.iter().map(|(p, i)| (p.as_str(), *i)).collect();
@@ -409,6 +430,13 @@ pub fn font_definitions_with(language: crate::i18n::Language, used: &[String]) -
         }
         chain.extend(if role == MONO { base_mono.clone() } else { base_prop.clone() });
         chain.extend(fallback.iter().cloned());
+        if role == MONO {
+            // The embedded monospace faces sit just ahead of the script fallback faces: after the
+            // system and egui monospace fonts, so Latin text keeps its look.
+            let at = chain.iter().position(|k| fallback.contains(k)).unwrap_or(chain.len());
+            let mono: Vec<String> = craft_mono.iter().filter(|k| !chain.contains(k)).cloned().collect();
+            chain.splice(at..at, mono);
+        }
         chain.retain(|k| fonts.font_data.contains_key(k));
         fonts.families.insert(FontFamily::Name(role.into()), chain);
         bound.push(role.to_string());
@@ -708,8 +736,10 @@ pub fn apply(ctx: &egui::Context, dark: bool) {
         v.widgets.hovered.weak_bg_fill = t.hover;
         v.widgets.active.weak_bg_fill = t.pressed;
         v.widgets.inactive.bg_stroke = Stroke::new(1.0, t.input_border);
-        v.window_corner_radius = egui::CornerRadius::same(10);
-        v.menu_corner_radius = egui::CornerRadius::same(8);
+        // The house radii in dark mode (craft-tokens XL windows, LG menus).
+        let (window_r, menu_r) = if dark { (craft_tokens::radius::XL as u8, craft_tokens::radius::LG as u8) } else { (10, 8) };
+        v.window_corner_radius = egui::CornerRadius::same(window_r);
+        v.menu_corner_radius = egui::CornerRadius::same(menu_r);
         v.popup_shadow = egui::epaint::Shadow { offset: [0, 4], blur: 16, spread: 0, color: t.shadow };
         ctx.set_visuals_of(theme, v);
     }
@@ -792,8 +822,15 @@ mod tests {
         for han in [HanOrder::Chinese, HanOrder::Japanese] {
             let language = if han == HanOrder::Japanese { Language::Ja } else { Language::Zh };
             let fonts = font_definitions_for_language(language);
-            let fb_keys: Vec<String> =
+            let mut fb_keys: Vec<String> =
                 fallback_faces(han).into_iter().map(|(k, _)| k.to_string()).filter(|k| fonts.font_data.contains_key(k)).collect();
+            // The embedded craft-fonts faces (when built with them) follow the system ones.
+            let (craft_ui, _) = crate::craft_fonts::load(&mut FontDefinitions::default());
+            for k in craft_ui {
+                if !fb_keys.contains(&k) && fonts.font_data.contains_key(&k) {
+                    fb_keys.push(k);
+                }
+            }
             if fb_keys.is_empty() {
                 return; // no fallback face on this machine (minimal Linux)
             }

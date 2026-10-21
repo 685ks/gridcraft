@@ -11,6 +11,7 @@ mod border_preview;
 mod cell_pictures;
 pub mod chartview;
 pub mod control;
+mod craft_fonts;
 pub mod credits;
 pub mod dialogs;
 pub mod editor;
@@ -27,6 +28,7 @@ pub mod panes;
 pub mod paper_view;
 pub mod pivot_pane;
 pub mod printing;
+pub mod project_links;
 pub mod ribbon;
 pub mod selection_glide;
 pub mod tabs;
@@ -95,7 +97,8 @@ fn lenient_interface_scale<'de, D: serde::Deserializer<'de>>(d: D) -> Result<u16
 impl Default for UiState {
     fn default() -> Self {
         UiState {
-            dark: false,
+            // The house theme (dark mode) by default.
+            dark: true,
             system_theme: false,
             ribbon_tab: "Home".into(),
             ribbon_collapsed: false,
@@ -319,7 +322,7 @@ impl SheetApp {
             fonts_seen: (0, 0),
             fonts_rebind: false,
             fonts_han: None,
-            effective_dark: false,
+            effective_dark: true,
             desktop_theme: desktop_theme::DesktopTheme::default(),
             desktop_dark: None,
             name_box: None,
