@@ -1,52 +1,29 @@
-# GridCraft app icon (PLACEHOLDER)
+# GridCraft app icon
 
-**This icon is temporary.** Every Crafting App's icon is an engraved creature portrait that the
-product owner makes (craftrules `standards/icon-design.md`); GridCraft's hasn't been made yet.
-Until it is, this placeholder stands in: a simple ledger page with a header row, a row-number
-column, a selected cell with its fill handle and a double rule under a total, on a full-bleed
-GridCraft-green tile. It is original geometry written by hand for this repository, deliberately
-not modelled on any vendor's spreadsheet logo (no letters, no "X", no overlapping panels).
-
-When the owner's art arrives, replace `gridcraft.svg`, run `packaging/icons.sh`, update this
-README (provenance, creature) and the rows in `ATTRIBUTION.md`, and drop the word placeholder.
+A spreadsheet grid with a header row and an active cell, drawn as a simple line glyph in the Arthavan Projects house style.
+Every app shares the same tile shape and glyph style, so the family reads as one set; each app has
+its own muted tint (hue 140°), and the glyph tells them apart.
 
 ## Palette
 
-Exactly three colours:
+The house style's dark tile and light accent, tinted to this app's hue:
 
 | Colour | Hex | Used for |
 |---|---|---|
-| Ink | `#0b0b0c` | Line work and contour |
-| Paper | `#efe9dc` | The page |
-| GridCraft green (app colour, **proposed**) | `#1f9d55` | The full-bleed field and the header cells |
-
-The app colour is a proposal pending the owner's approval: GridCraft green `#1f9d55`, with ink
-(darker) variant `#147a40` for text and accents on light backgrounds. It differs from
-DesignCraft's `#7bb51c`.
+| Tile | `#234d31` → `#0a1a0f` | Vertical gradient filling the rounded square |
+| Hairline | white at 14% | Inner edge of the tile |
+| Accent | `#98e1b1` | The glyph's strokes |
+| Accent bright | `#c2f4d3` | Highlights in the glyph |
+| Accent low | `#397f50` | Soft fills behind the glyph |
 
 ## Geometry
 
-A 512 × 512 viewBox, clipped to a rounded square with `rx=112`. Windows and Linux use the full
-tile. The macOS icons (`.icns`, `gridcraft-macos-512.png`) sit on Apple's grid: an 824/1024
-body with a transparent margin.
+A 512 × 512 viewBox, clipped to a rounded square with `rx=112`; glyph strokes are 30 units with
+round caps, so they stay legible at 16-32 px. Windows and Linux use the full tile. macOS files
+sit on Apple's grid (an 824/1024 body with a transparent margin, made by widening the viewBox).
 
-## Files
+## Provenance and licence
 
-| File | Use |
-|---|---|
-| `gridcraft.svg` | Canonical artwork; also `hicolor/scalable` |
-| `gridcraft-1024.png` | 1024 px render of the full tile |
-| `gridcraft-macos-512.png` | Runtime Dock icon on macOS (for `apps/gridcraft` to embed) |
-| `gridcraft.icns` | macOS bundle icon (`CFBundleIconFile`) |
-| `gridcraft.ico` | Windows exe icon, 16–256 px (embedded by `apps/gridcraft/build.rs`) |
-| `hicolor/<size>/apps/app.freedev.ainz.ks.GridCraft.png` | Linux icon theme, 16–512 px; the 256 px one is also the runtime window icon on Windows and Linux |
-| `hicolor/scalable/apps/app.freedev.ainz.ks.GridCraft.svg` | Linux scalable icon |
-| `LICENSE.txt` | MIT OR Apache-2.0 |
-
-The app ID is `app.freedev.ainz.ks.GridCraft`. It's used for the hicolor icon names, the Wayland app
-ID and `packaging/linux/app.freedev.ainz.ks.GridCraft.desktop`.
-
-## Regenerate
-
-Edit `gridcraft.svg`, then run `packaging/icons.sh`. It needs `resvg`, and `iconutil` for the
-`.icns` (macOS only). It packs the `.ico` with `cargo xtask ico`.
+Original work: written by hand as SVG for this project, no source image traced or copied.
+MIT OR Apache-2.0, like the code. `gridcraft.svg` is the master; `packaging/icons.sh` renders every
+other file here from it.
