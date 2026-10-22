@@ -5,14 +5,13 @@
 </p>
 
 <p align="center">
-  A fast, open-source, clean-room take on modern spreadsheet workflows. It runs natively on macOS,
-  Windows, Linux and BSD, and in the browser via WebAssembly.<br>
+  A fast, open-source, clean-room take on modern spreadsheet workflows. It runs natively on Windows, and in the browser via WebAssembly.<br>
   <i>Maintained by Arthavan Projects: a fork of <a href="https://github.com/storytold/gridcraft">storytold/gridcraft</a>, not affiliated with or endorsed by ArtCraft.</i>
 </p>
 
 <p align="center">
   <img alt="Written in Rust" src="https://img.shields.io/badge/written%20in-Rust-147a40?style=flat-square&logo=rust&logoColor=white">
-  <img alt="Runs on macOS, Windows, Linux, BSD and the web" src="https://img.shields.io/badge/runs%20on-macOS%20%C2%B7%20Windows%20%C2%B7%20Linux%20%C2%B7%20BSD%20%C2%B7%20Web-1f9d55?style=flat-square">
+  <img alt="Runs on Windows and the web" src="https://img.shields.io/badge/runs%20on-Windows%20%C2%B7%20Web-1f9d55?style=flat-square">
   <img alt="License: MIT OR Apache-2.0" src="https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-147a40?style=flat-square">
   <img alt="Agent-drivable over MCP" src="https://img.shields.io/badge/agents-MCP-1f9d55?style=flat-square">
 </p>
@@ -227,29 +226,6 @@ DirectX 12 shaders are compiled with FXC, which is part of Windows, so no `dxcom
 `dxil.dll` is needed, and a copy another program put on `PATH` can no longer stop the app at start
 ("Parent device is lost", #339). `$env:WGPU_DX12_COMPILER = "dxc"` (or `"auto"`) selects wgpu's DXC
 handling again for troubleshooting.
-
-### macOS
-
-| Build | File | Notes |
-|---|---|---|
-| App, universal (Apple silicon + Intel) | `gridcraft-<ver>-macos-universal.dmg` | Signed and notarized |
-| Command-line tool, universal | `gridcraft-cli-<ver>-macos-universal.zip` | Signed and notarized |
-
-### Linux
-
-| Format | x86_64 | aarch64 (ARM64) | Notes |
-|---|---|---|---|
-| AppImage | `gridcraft-<ver>-linux-x86_64.AppImage` | `gridcraft-<ver>-linux-aarch64.AppImage` | Runs anywhere; updates itself with [AppImageUpdate](https://github.com/AppImageCommunity/AppImageUpdate) (`.zsync` files) |
-| Flatpak | `gridcraft-<ver>-linux-x86_64.flatpak` | `gridcraft-<ver>-linux-aarch64.flatpak` | Sandboxed; `flatpak install --user <file>` |
-| Debian/Ubuntu | `gridcraft-<ver>-linux-x86_64.deb` | `gridcraft-<ver>-linux-aarch64.deb` | |
-| Fedora/RHEL/openSUSE | `gridcraft-<ver>-linux-x86_64.rpm` | `gridcraft-<ver>-linux-aarch64.rpm` | |
-| Tarball | `gridcraft-<ver>-linux-x86_64.tar.gz` | `gridcraft-<ver>-linux-aarch64.tar.gz` | Unpack anywhere |
-
-### FreeBSD
-
-| Build | File |
-|---|---|
-| x86_64 | `gridcraft-<ver>-freebsd-x86_64.tar.gz` |
 
 ### Web (WebAssembly)
 

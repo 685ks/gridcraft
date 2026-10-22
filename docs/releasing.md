@@ -3,7 +3,7 @@
 Releases are cut by hand from *Actions → Release → Run workflow*. `.github/workflows/release.yml`
 calls the shared Arthavan Projects release workflow
 (`685ks/craft-actions/.github/workflows/release-rust-app.yml`), which builds, packages and
-publishes GridCraft for macOS, Windows and Linux and creates the GitHub Release `v<version>` on
+publishes GridCraft for Windows and creates the GitHub Release `v<version>` on
 this repository: a **draft** unless the `publish` input is set. The Arthavan Projects launcher
 installs and updates GridCraft from these releases.
 
@@ -15,12 +15,12 @@ categories) is in [`packaging/app.toml`](../packaging/app.toml). User-facing nam
 | App-specific value | Where |
 |---|---|
 | Display name `GridCraft`, binaries `gridcraft` + `gridcraft-cli` | every script and workflow |
-| Bundle / app id `app.freedev.ainz.ks.GridCraft` | `packaging/macos/Info.plist.in`, `packaging/linux/*`, flatpak manifest |
-| Publisher `Arthavan Projects` | `packaging/app.toml`, WiX `Manufacturer`, nfpm `vendor`, Windows `CompanyName` |
+| Bundle / app id `app.freedev.ainz.ks.GridCraft` | `packaging/app.toml`, the Wayland app id |
+| Publisher `Arthavan Projects` | `packaging/app.toml`, WiX `Manufacturer`, Windows `CompanyName` |
 | WiX UpgradeCode `C72B2109-6F95-49E9-81D2-88C8B413618C` (this fork's, fixed forever) | `packaging/windows/gridcraft.wxs` |
-| File types `.xlsx` `.xlsm` `.xlsb` `.ods` `.csv` `.tsv` | Info.plist (`CFBundleDocumentTypes`), WiX (ProgIds/OpenWithProgids), `.desktop` `MimeType=`, `app.freedev.ainz.ks.GridCraft.mime.xml`, metainfo |
+| File types `.xlsx` `.xlsm` `.xlsb` `.ods` `.csv` `.tsv` | WiX (ProgIds/OpenWithProgids) |
 | Web app dir `apps/gridcraft-web` | `packaging/web/package.sh` |
-| App colour `#1f9d55` (ink `#147a40`), **proposed** | `assets/app-icon/README.md`, metainfo `<branding>` |
+| App colour `#1f9d55` (ink `#147a40`), **proposed** | `assets/app-icon/README.md` |
 
 ## Cutting a release
 
@@ -56,8 +56,7 @@ row in `ATTRIBUTION.md` (`cargo xtask assets`).
 
 - `.github/workflows/ci.yml` (every pull request and push to `main`): a rebrand guard and
   `cargo xtask ci` on Linux with craft-fonts, plus the core crates' tests and a build check of
-  the desktop app on macOS and Windows.
+  the desktop app on Windows.
 - `.github/workflows/packaging-lint.yml` (seconds, on changes to `packaging/`, the workflows or
-  the icons): `desktop-file-validate`, xmllint on the AppStream, MIME, WiX and Info.plist files,
-  and a check of `packaging/app.toml` and its icons.
+  the icons): xmllint on the WiX file, and a check of `packaging/app.toml` and its icons.
 - Locally: `cargo xtask ci` (fmt, clippy, tests, assets, layers, wasm, parity check).
