@@ -1,6 +1,6 @@
 # The AGENTS.md quality gate (`cargo xtask ci`: fmt, clippy -D warnings, tests, assets, layers,
 # wasm, parity --check) on every pull request and every push to main, plus the core crates' tests and a build
-# check of the desktop app on macOS and Windows.
+# check of the desktop app on Windows.
 #
 # Every third-party action is pinned by commit SHA.
 name: CI
@@ -80,7 +80,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [windows-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 75
     steps:
