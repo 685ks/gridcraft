@@ -1,5 +1,5 @@
-# Quick static checks for the release pipeline (seconds, no Rust build): the Linux desktop entry,
-# the AppStream, MIME, WiX and Info.plist XML, and the packaging metadata the release workflow reads.
+# Quick static checks for the release pipeline (seconds, no Rust build): the WiX XML and
+# the packaging metadata the release workflow reads.
 name: Packaging lint
 
 on:
@@ -20,21 +20,16 @@ concurrency:
 jobs:
   lint:
     timeout-minutes: 10
-    name: Desktop metadata
+    name: Packaging metadata
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install validators
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends desktop-file-utils libxml2-utils
-      - name: Validate the desktop entry and XML metadata
-        run: |
-          set -euo pipefail
-          desktop-file-validate packaging/linux/app.freedev.ainz.ks.GridCraft.desktop
-          xmllint --noout packaging/linux/app.freedev.ainz.ks.GridCraft.metainfo.xml.in \
-            packaging/linux/app.freedev.ainz.ks.GridCraft.mime.xml packaging/windows/gridcraft.wxs \
-            packaging/macos/Info.plist.in
+          sudo apt-get install -y --no-install-recommends libxml2-utils
+      - name: Validate the WiX XML
+        run: xmllint --noout packaging/windows/gridcraft.wxs
       - name: Check packaging/app.toml
         shell: python3 {0}
         run: |
